@@ -1,0 +1,143 @@
+<div style="text-align: center ;margin-top: 50px;">
+    <h1> C.R.U.D Users </h1>
+</div>
+<div class="card my-5" >
+    <div class="card-body" >
+        <form (ngSubmit)="addOrUpdateUser()" #userForm="ngForm">
+            <div style=" font-size: 25px; font-weight: 700; text-align: center;">
+                <label for="slotForm">Add User</label>
+            </div>
+            <div class="form-group">
+                <label for="User Id" [innerText]="'User Id: '+(this.user.userId )" style="font-weight: 700 ;">
+                </label><br><br>
+                <label for="username">Username</label>
+
+                <input type="text" [(ngModel)]="user.username" class="form-control" id="username" name="username"
+                    required placeholder="Enter username" #username="ngModel" pattern="^[a-z0-9_.]*$">
+                <div *ngIf="username.invalid && (username.dirty || username.touched)" class="alert alert-danger">
+                    <div *ngIf="username.errors?.['pattern']">
+                        Username can only have lower-case alphanumerics, underscores, dots and no spaces.
+                    </div>
+                    <div *ngIf="username.errors?.['required']">
+                        Username is required.
+                    </div>
+                    <div *ngIf="isDuplicateUsername">
+                        Username already taken.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" [(ngModel)]="user.name" class="form-control" id="name" name="name"
+                    placeholder="Enter name" required #name="ngModel" pattern="[a-zA-Z ]+">
+                <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+                    <div *ngIf="name.errors?.['pattern']">
+                        Name can only have alphabets and spaces.
+                    </div>
+                    <div *ngIf="name.errors?.['required']">
+                        Name is required.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" [(ngModel)]="user.email" class="form-control" id="email" name="email"
+                    placeholder="Enter email address" required pattern="^[a-zA-Z0-9._]+@[a-zA-Z0-9-]+(.[a-zA-Z0-9-]+)*$"
+                    #email="ngModel">
+                <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert alert-danger">
+                    <div *ngIf="email.errors?.['pattern']">
+                        Email format is wrong.
+                    </div>
+                    <div *ngIf="email.errors?.['required']">
+                        Email is required.
+                    </div>
+                    <div *ngIf="isDuplicateEmail">
+                        Email already has a user.
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" [(ngModel)]="user.password" class="form-control" id="password" name="password"
+                    placeholder="Enter password" required minlength="8" #password="ngModel">
+                <div *ngIf="password.invalid && (password.dirty || password.touched)" class="alert alert-danger">
+                    <div *ngIf="password.errors?.['minlength']">
+                        Password minimum length is 8 charcters.
+                    </div>
+                    <div *ngIf="password.errors?.['required']">
+                        Password is required.
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- <div class="form-group">
+                <label for="userType">User Type</label>
+
+                <input type="text" [(ngModel)]="currentUserType" class="form-control" id="userTypeTxt"
+                    name="userTypeTxt" disabled="true" #userTypeTxt="ngModel" [hidden]="isAdd" />
+
+                <select [(ngModel)]="user.userType" class="form-control" required name="userType" #userType="ngModel">
+                    <option>Normal</option>
+                    <option>VIP</option>
+                    <option>Admin</option>
+                </select>
+
+                <div *ngIf="userType.invalid && (userType.dirty || userType.touched)" class="alert alert-danger">
+                    <div *ngIf="name.errors?.['required']">
+                        User Type is required.
+                    </div>
+                </div>
+                <div [hidden]="!isVIP()">
+                    <label for="slotIdIfVIPTxt">Slot for VIP user</label>
+
+                    <input type="text" [(ngModel)]="this.currentSlotIdIfVIP" class="form-control" id="slotIdIfVIPTxt"
+                        name="slotIdIfVIPTxt" disabled="true" #slotIdIfVIPTxt="ngModel" [hidden]="isAdd">
+
+                    <select [(ngModel)]="this.slotIdIfVIPString" class="form-control" name="slotIdifvip"
+                        #slotIdifvip="ngModel">
+                        <option selected value="select">Select</option>
+                        <option *ngFor="let slot of unBookedSlots">{{slot.slotId}}</option>
+                    </select>
+                </div> 
+            </div> -->
+            
+            <br>
+            <button type="submit" [disabled]="!userForm.form.valid" class="btn btn-info" style="margin-right: 10px;"
+                [hidden]="!isAdd">Add</button>
+            <button type="submit" [disabled]="!userForm.form.valid" class="btn btn-info" style="margin-right: 10px;"
+                [hidden]="isAdd">Update</button>
+        </form>
+    </div>
+</div>
+
+
+<div class="card my-5">
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">User Id</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Update</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users; let i=index;">
+                    <td>{{ user.userId }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.name }}</td>
+                    <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                    <td><button class="btn btn-info" (click)="isAdd=false;updateUser(i);">Update</button></td>
+                    <td><button class="btn btn-info" style="background-color: #bb0000;color:white;"
+                            (click)="deleteUser(i);">Delete</button></td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
